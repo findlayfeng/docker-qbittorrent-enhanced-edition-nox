@@ -23,12 +23,14 @@ RUN \
 # image for building
 FROM base AS builder
 
-ARG QBT_VERSION \
+ARG QBTEX_VERSION \
     BOOST_VERSION_MAJOR="1" \
     BOOST_VERSION_MINOR="86" \
     BOOST_VERSION_PATCH="0" \
     LIBBT_VERSION="RC_1_2" \
     LIBBT_CMAKE_FLAGS=""
+
+ARG QBT_VERSION=${QBTEX_VERSION%.*}
 
 # check environment variables
 RUN \
@@ -90,16 +92,16 @@ RUN \
 
 # build qbittorrent
 RUN \
-  if [ "${QBT_VERSION}" = "devel" ]; then \
+  if [ "${QBTEX_VERSION}" = "devel" ]; then \
     git clone \
       --depth 1 \
       --recurse-submodules \
-      https://github.com/qbittorrent/qBittorrent.git && \
-    cd qBittorrent ; \
+      https://github.com/c0re100/qBittorrent-Enhanced-Edition.git && \
+    cd qBittorrent-Enhanced-Edition ; \
   else \
-    wget "https://github.com/qbittorrent/qBittorrent/archive/refs/tags/release-${QBT_VERSION}.tar.gz" && \
-    tar -xf "release-${QBT_VERSION}.tar.gz" && \
-    cd "qBittorrent-release-${QBT_VERSION}" ; \
+    wget "https://github.com/c0re100/qBittorrent-Enhanced-Edition/archive/refs/tags/release-${QBTEX_VERSION}.tar.gz" && \
+    tar -xf "release-${QBTEX_VERSION}.tar.gz" && \
+    cd "qBittorrent-Enhanced-Edition-release-${QBTEX_VERSION}" ; \
   fi && \
   cmake \
     -B build \
@@ -123,7 +125,7 @@ RUN \
   echo "libtorrent-rasterbar git $(git rev-parse HEAD)" >> /sbom.txt && \
   cd .. && \
   if [ "${QBT_VERSION}" = "devel" ]; then \
-    cd qBittorrent && \
+    cd qBittorrent-Enhanced-Edition && \
     echo "qBittorrent git $(git rev-parse HEAD)" >> /sbom.txt && \
     cd .. ; \
   else \
